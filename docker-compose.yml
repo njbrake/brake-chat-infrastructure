@@ -1,6 +1,7 @@
 services:
   openwebui:
-    image: ghcr.io/njbrake/open-webui:main
+    pull_policy: always
+    image: ghcr.io/njbrake/brake-chat:main
     container_name: openwebui
     restart: unless-stopped
     volumes:
