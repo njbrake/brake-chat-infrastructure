@@ -15,13 +15,16 @@ services:
       - ENABLE_OAUTH_SIGNUP=false
     network_mode: host
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    command:
+      - "http"
+      - "--url=lilli-hypermetropic-lizeth.ngrok-free.dev"
+      - "8080"
     environment:
-      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     network_mode: host
 
 volumes:
