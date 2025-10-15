@@ -14,6 +14,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - ENABLE_OAUTH_SIGNUP=true
       - DEFAULT_USER_ROLE=pending
+      - PENDING_USER_OVERLAY_CONTENT=Your account status is currently pending activation.\nTo access the WebUI, please reach out to the administrator.
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
     network_mode: host
 
