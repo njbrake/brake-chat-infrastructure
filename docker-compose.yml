@@ -16,6 +16,7 @@ services:
       - DEFAULT_USER_ROLE=pending
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ENABLE_WEBSOCKET_SUPPORT=True
     network_mode: host
 
 
