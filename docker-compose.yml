@@ -13,6 +13,7 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - ENABLE_OAUTH_SIGNUP=false
+      - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
     network_mode: host
 
 
