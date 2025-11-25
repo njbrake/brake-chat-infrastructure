@@ -1,13 +1,12 @@
 services:
   openwebui:
     pull_policy: always
-    image: ghcr.io/njbrake/brake-chat:main
+    image: ghcr.io/njbrake/brake-chat:main # This is a fork of OpenWebUI. See https://github.com/njbrake/brake-chat for more details. You can only modify it like this if you are serving 30 or fewer users (otherwise you need to pay OpenWebUI for an enterprise license).
     container_name: openwebui
     restart: unless-stopped
     volumes:
-      - openwebui_data:/app/backend/data
+      - openwebui_data:/app/backend/data # This is the volume where all the stuff you edit and maintain in OpenWebUI is stored.
     environment:
-      - OLLAMA_BASE_URL=http://127.0.0.1:11434
       - WEBUI_URL=${WEBUI_URL}
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -15,10 +14,19 @@ services:
       - ENABLE_OAUTH_SIGNUP=true
       - DEFAULT_USER_ROLE=pending
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ENABLE_WEBSOCKET_SUPPORT=True
-    network_mode: host
-
+      # DEBUG LOGS
+      - CONFIG_LOG_LEVEL=DEBUG
+      - DB_LOG_LEVEL=DEBUG
+      - MAIN_LOG_LEVEL=DEBUG
+      - MODELS_LOG_LEVEL=DEBUG
+      - OPENAI_LOG_LEVEL=DEBUG
+      - WEBHOOK_LOG_LEVEL=DEBUG
+    networks:
+      - app-network
+    ports:
+      - "8080:8080"
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -28,5 +36,24 @@ services:
     environment:
       - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     network_mode: host
+
+  notion:
+    image: ghcr.io/njbrake/notion-mcp-server:main # This is a fork of the official Notion MCP server that is optimized for LLM usage. See https://github.com/njbrake/notion-mcp-server for more details.
+    container_name: notion
+    restart: unless-stopped
+    command: --transport http --port 3000
+    environment:
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      - AUTH_TOKEN=${NOTION_TOKEN}
+      - NOTION_MCP_TOOLS_INCLUDE=post-search,retrieve-a-page,get-block-children,post-data,base-query,retrieve-a-database,post-page,patch-page,patch-block-children,update-a-block
+    networks:
+      - app-network
+    ports:
+      - "3001:3000"
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   openwebui_data:
