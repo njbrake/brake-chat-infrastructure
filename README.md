@@ -1,4 +1,4 @@
-# Home Server Stack
+# BrakeChat Infrastructure
 
 Deploy a OpenWebUI server on your own hardware, expose it securely to the web via Cloudflare tunnels, and secure it
 with Google OAuth. See `docker-compose.yml` for the stack and variables.
