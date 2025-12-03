@@ -16,12 +16,13 @@ services:
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ENABLE_WEBSOCKET_SUPPORT=True
-      - CONFIG_LOG_LEVEL=DEBUG
-      - DB_LOG_LEVEL=DEBUG
-      - MAIN_LOG_LEVEL=DEBUG
-      - MODELS_LOG_LEVEL=DEBUG
-      - OPENAI_LOG_LEVEL=DEBUG
-      - WEBHOOK_LOG_LEVEL=DEBUG
+      - ENABLE_VERSION_UPDATE_CHECK=false # Not interested in the notification popus
+      # - CONFIG_LOG_LEVEL=DEBUG
+      # - DB_LOG_LEVEL=DEBUG
+      # - MAIN_LOG_LEVEL=DEBUG
+      # - MODELS_LOG_LEVEL=DEBUG
+      # - OPENAI_LOG_LEVEL=DEBUG
+      # - WEBHOOK_LOG_LEVEL=DEBUG
     networks:
       - app-network
     ports:
