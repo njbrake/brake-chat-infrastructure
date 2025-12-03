@@ -17,7 +17,6 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ENABLE_WEBSOCKET_SUPPORT=True
       - ENABLE_VERSION_UPDATE_CHECK=false # Not interested in the notification popups
-      - BYPASS_EMBEDDING_AND_RETRIEVAL=true # I don't want any RAG happening
       # - CONFIG_LOG_LEVEL=DEBUG
       # - DB_LOG_LEVEL=DEBUG
       # - MAIN_LOG_LEVEL=DEBUG
