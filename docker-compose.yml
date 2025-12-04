@@ -38,6 +38,7 @@ services:
     network_mode: host
 
   notion:
+    pull_policy: always
     image: ghcr.io/njbrake/notion-mcp-server:main # This is a fork of the official Notion MCP server that is optimized for LLM usage. See https://github.com/njbrake/notion-mcp-server for more details.
     container_name: notion
     restart: unless-stopped
@@ -50,6 +51,19 @@ services:
       - app-network
     ports:
       - "3001:3000"
+
+  recipes_mcp:
+    pull_policy: always
+    image: ghcr.io/njbrake/filesystem-mcp-server:main
+    container_name: recipes-mcp
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    volumes:
+      - /home/builder/scm/recipes:/data:rw
+    command: --allowed-root /data --port 8123
+    networks:
+      - app-network
 
 networks:
   app-network:
