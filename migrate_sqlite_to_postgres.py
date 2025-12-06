@@ -222,6 +222,184 @@ def migrate_file(sqlite_conn, pg_conn):
         print(f"  Warning: Could not migrate file table: {e}")
         print(f"  Skipping file table...")
 
+def migrate_model(sqlite_conn, pg_conn):
+    """Migrate model table"""
+    print("Migrating model table...")
+    sqlite_cur = sqlite_conn.cursor()
+    pg_cur = pg_conn.cursor()
+
+    try:
+        sqlite_cur.execute("SELECT * FROM model")
+        rows = sqlite_cur.fetchall()
+
+        for row in rows:
+            is_active = bool(row['is_active']) if 'is_active' in row.keys() and row['is_active'] is not None else True
+
+            pg_cur.execute(
+                """INSERT INTO model (id, user_id, base_model_id, name, params, meta,
+                   updated_at, created_at, is_active, access_control)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
+                (
+                    row['id'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['base_model_id'] if 'base_model_id' in row.keys() else None,
+                    row['name'] if 'name' in row.keys() else None,
+                    row['params'] if 'params' in row.keys() else None,
+                    row['meta'] if 'meta' in row.keys() else None,
+                    row['updated_at'] if 'updated_at' in row.keys() else None,
+                    row['created_at'] if 'created_at' in row.keys() else None,
+                    is_active,
+                    row['access_control'] if 'access_control' in row.keys() else None
+                )
+            )
+
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} model records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate model table: {e}")
+        print(f"  Skipping model table...")
+
+def migrate_prompt(sqlite_conn, pg_conn):
+    """Migrate prompt table"""
+    print("Migrating prompt table...")
+    sqlite_cur = sqlite_conn.cursor()
+    pg_cur = pg_conn.cursor()
+
+    try:
+        sqlite_cur.execute("SELECT * FROM prompt")
+        rows = sqlite_cur.fetchall()
+
+        for row in rows:
+            pg_cur.execute(
+                """INSERT INTO prompt (command, user_id, title, content, timestamp)
+                   VALUES (%s, %s, %s, %s, %s)
+                   ON CONFLICT (command) DO NOTHING""",
+                (
+                    row['command'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['title'] if 'title' in row.keys() else None,
+                    row['content'] if 'content' in row.keys() else None,
+                    row['timestamp'] if 'timestamp' in row.keys() else None
+                )
+            )
+
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} prompt records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate prompt table: {e}")
+        print(f"  Skipping prompt table...")
+
+def migrate_tool(sqlite_conn, pg_conn):
+    """Migrate tool table"""
+    print("Migrating tool table...")
+    sqlite_cur = sqlite_conn.cursor()
+    pg_cur = pg_conn.cursor()
+
+    try:
+        sqlite_cur.execute("SELECT * FROM tool")
+        rows = sqlite_cur.fetchall()
+
+        for row in rows:
+            pg_cur.execute(
+                """INSERT INTO tool (id, user_id, name, content, specs, meta,
+                   valves, updated_at, created_at, access_control)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
+                (
+                    row['id'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['name'] if 'name' in row.keys() else None,
+                    row['content'] if 'content' in row.keys() else None,
+                    row['specs'] if 'specs' in row.keys() else None,
+                    row['meta'] if 'meta' in row.keys() else None,
+                    row['valves'] if 'valves' in row.keys() else None,
+                    row['updated_at'] if 'updated_at' in row.keys() else None,
+                    row['created_at'] if 'created_at' in row.keys() else None,
+                    row['access_control'] if 'access_control' in row.keys() else None
+                )
+            )
+
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} tool records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate tool table: {e}")
+        print(f"  Skipping tool table...")
+
+def migrate_knowledge(sqlite_conn, pg_conn):
+    """Migrate knowledge table"""
+    print("Migrating knowledge table...")
+    sqlite_cur = sqlite_conn.cursor()
+    pg_cur = pg_conn.cursor()
+
+    try:
+        sqlite_cur.execute("SELECT * FROM knowledge")
+        rows = sqlite_cur.fetchall()
+
+        for row in rows:
+            pg_cur.execute(
+                """INSERT INTO knowledge (id, user_id, name, description, data,
+                   meta, updated_at, created_at, access_control)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
+                (
+                    row['id'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['name'] if 'name' in row.keys() else None,
+                    row['description'] if 'description' in row.keys() else None,
+                    row['data'] if 'data' in row.keys() else None,
+                    row['meta'] if 'meta' in row.keys() else None,
+                    row['updated_at'] if 'updated_at' in row.keys() else None,
+                    row['created_at'] if 'created_at' in row.keys() else None,
+                    row['access_control'] if 'access_control' in row.keys() else None
+                )
+            )
+
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} knowledge records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate knowledge table: {e}")
+        print(f"  Skipping knowledge table...")
+
+def migrate_function(sqlite_conn, pg_conn):
+    """Migrate function table"""
+    print("Migrating function table...")
+    sqlite_cur = sqlite_conn.cursor()
+    pg_cur = pg_conn.cursor()
+
+    try:
+        sqlite_cur.execute("SELECT * FROM function")
+        rows = sqlite_cur.fetchall()
+
+        for row in rows:
+            is_active = bool(row['is_active']) if 'is_active' in row.keys() and row['is_active'] is not None else True
+            is_global = bool(row['is_global']) if 'is_global' in row.keys() and row['is_global'] is not None else False
+
+            pg_cur.execute(
+                """INSERT INTO function (id, user_id, name, type, content, meta,
+                   is_active, is_global, updated_at, created_at)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
+                (
+                    row['id'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['name'] if 'name' in row.keys() else None,
+                    row['type'] if 'type' in row.keys() else None,
+                    row['content'] if 'content' in row.keys() else None,
+                    row['meta'] if 'meta' in row.keys() else None,
+                    is_active,
+                    is_global,
+                    row['updated_at'] if 'updated_at' in row.keys() else None,
+                    row['created_at'] if 'created_at' in row.keys() else None
+                )
+            )
+
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} function records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate function table: {e}")
+        print(f"  Skipping function table...")
+
 def main():
     """Main migration function"""
     print("=" * 60)
@@ -253,13 +431,11 @@ def main():
         migrate_chatidtag(sqlite_conn, pg_conn)
         migrate_document(sqlite_conn, pg_conn)
         migrate_file(sqlite_conn, pg_conn)
-
-        # Add more tables as needed:
-        # migrate_model(sqlite_conn, pg_conn)
-        # migrate_prompt(sqlite_conn, pg_conn)
-        # migrate_function(sqlite_conn, pg_conn)
-        # migrate_memory(sqlite_conn, pg_conn)
-        # etc.
+        migrate_model(sqlite_conn, pg_conn)
+        migrate_prompt(sqlite_conn, pg_conn)
+        migrate_tool(sqlite_conn, pg_conn)
+        migrate_knowledge(sqlite_conn, pg_conn)
+        migrate_function(sqlite_conn, pg_conn)
 
         print()
         print("=" * 60)
