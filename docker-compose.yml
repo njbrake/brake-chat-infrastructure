@@ -4,6 +4,9 @@ services:
     image: ghcr.io/njbrake/brake-chat:main # This is a fork of OpenWebUI. See https://github.com/njbrake/brake-chat for more details. You can only modify it like this if you are serving 30 or fewer users (otherwise you need to pay OpenWebUI for an enterprise license).
     container_name: openwebui
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
       - openwebui_data:/app/backend/data # This is the volume where all the stuff you edit and maintain in OpenWebUI is stored.
     environment:
@@ -17,6 +20,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ENABLE_WEBSOCKET_SUPPORT=True
       - ENABLE_VERSION_UPDATE_CHECK=false # Not interested in the notification popups
+      - DATABASE_URL=postgresql://openwebui_user:${POSTGRES_PASSWORD}@postgres:5432/openwebui
       # - CONFIG_LOG_LEVEL=DEBUG
       # - DB_LOG_LEVEL=DEBUG
       # - MAIN_LOG_LEVEL=DEBUG
@@ -27,6 +31,26 @@ services:
       - app-network
     ports:
       - "8080:8080"
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: openwebui_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: openwebui
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openwebui_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -71,3 +95,4 @@ networks:
 
 volumes:
   openwebui_data:
+  postgres_data:
