@@ -99,14 +99,13 @@ def migrate_chat(sqlite_conn, pg_conn):
 
         pg_cur.execute(
             """INSERT INTO chat (id, user_id, title, chat, archived, created_at,
-               updated_at, share_id, archived_at, pinned, meta, folder_id)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+               updated_at, share_id, pinned, meta, folder_id)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                ON CONFLICT (id) DO NOTHING""",
             (
                 row['id'], row['user_id'], row['title'], row['chat'],
                 archived, row['created_at'], row['updated_at'],
                 row['share_id'] if 'share_id' in row.keys() else None,
-                row['archived_at'] if 'archived_at' in row.keys() else None,
                 pinned,
                 row['meta'] if 'meta' in row.keys() else None,
                 row['folder_id'] if 'folder_id' in row.keys() else None
