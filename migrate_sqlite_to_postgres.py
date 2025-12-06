@@ -152,13 +152,14 @@ def migrate_tag(sqlite_conn, pg_conn):
         tag_id = row['id']
         tag_name = row['name']
         user_id = row['user_id'] if 'user_id' in row.keys() else None
-        data = row['data'] if 'data' in row.keys() else None
+        # PostgreSQL uses 'meta' instead of 'data'
+        meta = row['data'] if 'data' in row.keys() else (row['meta'] if 'meta' in row.keys() else None)
 
         pg_cur.execute(
-            """INSERT INTO tag (id, name, user_id, data)
+            """INSERT INTO tag (id, name, user_id, meta)
                VALUES (%s, %s, %s, %s)
-               ON CONFLICT (id) DO NOTHING""",
-            (tag_id, tag_name, user_id, data)
+               ON CONFLICT (id, user_id) DO NOTHING""",
+            (tag_id, tag_name, user_id, meta)
         )
 
     pg_conn.commit()
