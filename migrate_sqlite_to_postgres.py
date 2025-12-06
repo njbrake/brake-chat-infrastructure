@@ -148,11 +148,17 @@ def migrate_tag(sqlite_conn, pg_conn):
     rows = sqlite_cur.fetchall()
 
     for row in rows:
+        # Handle optional columns
+        tag_id = row['id']
+        tag_name = row['name']
+        user_id = row['user_id'] if 'user_id' in row.keys() else None
+        data = row['data'] if 'data' in row.keys() else None
+
         pg_cur.execute(
             """INSERT INTO tag (id, name, user_id, data)
                VALUES (%s, %s, %s, %s)
                ON CONFLICT (id) DO NOTHING""",
-            (row['id'], row['name'], row['user_id'], row['data'])
+            (tag_id, tag_name, user_id, data)
         )
 
     pg_conn.commit()
@@ -168,11 +174,14 @@ def migrate_chatidtag(sqlite_conn, pg_conn):
     rows = sqlite_cur.fetchall()
 
     for row in rows:
+        # Handle optional columns
+        timestamp = row['timestamp'] if 'timestamp' in row.keys() else None
+
         pg_cur.execute(
             """INSERT INTO chatidtag (id, tag_name, chat_id, user_id, timestamp)
                VALUES (%s, %s, %s, %s, %s)
                ON CONFLICT (id) DO NOTHING""",
-            (row['id'], row['tag_name'], row['chat_id'], row['user_id'], row['timestamp'])
+            (row['id'], row['tag_name'], row['chat_id'], row['user_id'], timestamp)
         )
 
     pg_conn.commit()
@@ -184,26 +193,33 @@ def migrate_file(sqlite_conn, pg_conn):
     sqlite_cur = sqlite_conn.cursor()
     pg_cur = pg_conn.cursor()
 
-    sqlite_cur.execute("SELECT * FROM file")
-    rows = sqlite_cur.fetchall()
+    try:
+        sqlite_cur.execute("SELECT * FROM file")
+        rows = sqlite_cur.fetchall()
 
-    for row in rows:
-        pg_cur.execute(
-            """INSERT INTO file (id, user_id, hash, filename, data, meta, created_at, updated_at, path)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-               ON CONFLICT (id) DO NOTHING""",
-            (
-                row['id'], row['user_id'], row['hash'] if 'hash' in row.keys() else None,
-                row['filename'], row['data'] if 'data' in row.keys() else None,
-                row['meta'] if 'meta' in row.keys() else None,
-                row['created_at'] if 'created_at' in row.keys() else None,
-                row['updated_at'] if 'updated_at' in row.keys() else None,
-                row['path'] if 'path' in row.keys() else None
+        for row in rows:
+            pg_cur.execute(
+                """INSERT INTO file (id, user_id, hash, filename, data, meta, created_at, updated_at, path)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
+                (
+                    row['id'],
+                    row['user_id'] if 'user_id' in row.keys() else None,
+                    row['hash'] if 'hash' in row.keys() else None,
+                    row['filename'] if 'filename' in row.keys() else None,
+                    row['data'] if 'data' in row.keys() else None,
+                    row['meta'] if 'meta' in row.keys() else None,
+                    row['created_at'] if 'created_at' in row.keys() else None,
+                    row['updated_at'] if 'updated_at' in row.keys() else None,
+                    row['path'] if 'path' in row.keys() else None
+                )
             )
-        )
 
-    pg_conn.commit()
-    print(f"  Migrated {len(rows)} file records")
+        pg_conn.commit()
+        print(f"  Migrated {len(rows)} file records")
+    except Exception as e:
+        print(f"  Warning: Could not migrate file table: {e}")
+        print(f"  Skipping file table...")
 
 def main():
     """Main migration function"""
