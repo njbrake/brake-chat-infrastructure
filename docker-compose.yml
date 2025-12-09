@@ -47,7 +47,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U openwebui_user"]
+      test: ["CMD-SHELL", "pg_isready -d openwebui -U openwebui_user"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -70,7 +70,7 @@ services:
     environment:
       - NOTION_TOKEN=${NOTION_TOKEN}
       - AUTH_TOKEN=${NOTION_TOKEN}
-      - NOTION_MCP_TOOLS_INCLUDE=post-search,retrieve-a-page,get-block-children,post-data,base-query,retrieve-a-database,post-page,patch-page,patch-block-children,update-a-block
+      - NOTION_MCP_TOOLS_INCLUDE=post-search,retrieve-a-page,get-block-children,post-data,base-query,retrieve-a-database,patch-page,patch-block-children,update-a-block,post-database-query,post-page
     networks:
       - app-network
     ports:
